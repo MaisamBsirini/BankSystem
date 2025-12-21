@@ -1,4 +1,5 @@
 package customer;
 
-public class RecommendationStrategy {
+public interface RecommendationStrategy {
+    void recommend(TransactionEvent event);
 }

@@ -1,4 +1,6 @@
 package customer;
 
-public class Observer {
+public interface Observer {
+    void update(TransactionEvent event);
 }
+

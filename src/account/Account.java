@@ -57,6 +57,10 @@ public abstract class Account {
         this.state = state;
     }
 
+    public AccountState getState() {
+        return state;
+    }
+
     public double getBalance() {
         return balance;
     }
