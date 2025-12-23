@@ -17,12 +17,13 @@ public class CustomerService {
 
     public Customer findByName(String name) {
         for (Customer c : customers) {
-            if (c != null && c.toString().contains(name)) {
+            if (c != null && c.getName().equalsIgnoreCase(name)) {
                 return c;
             }
         }
         return null;
     }
+
 
     public void sendInquiry(String customerName, String message) {
         ticketService.createTicket(customerName, message);

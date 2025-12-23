@@ -1,7 +1,5 @@
 package customer;
 
-
-
 public class Customer implements Observer {
 
     private String name;
@@ -9,7 +7,11 @@ public class Customer implements Observer {
 
     public Customer(String name, RecommendationEngine engine) {
         this.name = name;
-        this.engine = engine;
+        if (engine == null) {
+            this.engine = new RecommendationEngine(new DefaultRecommendationStrategy());
+        } else {
+            this.engine = engine;
+        }
     }
 
     @Override
@@ -19,7 +21,10 @@ public class Customer implements Observer {
                         " notified about " + event.getType() +
                         " of $" + event.getAmount()
         );
-
         engine.process(event);
     }
+    public String getName() {
+        return name;
+    }
+
 }
