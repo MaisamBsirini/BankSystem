@@ -1,101 +1,88 @@
 package core;
 
 import account.Account;
-import account.SavingsAccount;
-import customer.Customer;
 import transaction.Transaction;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import transaction.TransactionType;
+import transaction.TransactionStatus;
 
-/**
- * 💾 DatabaseFacade
- * واجهة بسيطة للتعامل مع DB لكل الأقسام
- */
+import java.sql.*;
+
 public class DatabaseFacade {
 
-    private DatabaseConnection db;
+    private Connection connection;
 
-    public DatabaseFacade() {
-        db = DatabaseConnection.getInstance();
-    }
-
-    // ------------------ Customers ------------------
-    public void addCustomer(Customer customer) {
+    public DatabaseFacade(String url, String username, String password) {
         try {
-            String sql = "INSERT INTO customers (customer_id, full_name, email, phone) VALUES (?, ?, ?, ?)";
-            PreparedStatement stmt = db.getConnection().prepareStatement(sql);
-            stmt.setString(1, customer.getCustomerId());
-            stmt.setString(2, customer.getFullName());
-            stmt.setString(3, customer.getEmail());
-            stmt.setString(4, customer.getPhone());
-            stmt.executeUpdate();
-            core.Logger.log("Customer " + customer.getCustomerId() + " added.");
-        } catch (SQLException e) {
-            core.ErrorHandler.handle(e);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database connected successfully.");
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Database connection failed: " + e.getMessage());
         }
     }
 
-    public Customer getCustomer(String customerId) {
+    public void closeConnection() {
         try {
-            String sql = "SELECT * FROM customers WHERE customer_id = ?";
-            PreparedStatement stmt = db.getConnection().prepareStatement(sql);
-            stmt.setString(1, customerId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Customer(rs.getString("customer_id"), rs.getString("full_name"),
-                        rs.getString("email"), rs.getString("phone"));
-            }
+            if (connection != null)
+                connection.close();
         } catch (SQLException e) {
-            core.ErrorHandler.handle(e);
+            e.printStackTrace();
         }
-        return null;
     }
 
-    // ------------------ Accounts ------------------
-    public void addAccount(Account account) {
-        try {
-            String sql = "INSERT INTO accounts (account_id, owner_id, account_type, balance, interest_rate, status) VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement stmt = db.getConnection().prepareStatement(sql);
+    // ----------------- Accounts -----------------
+
+    public void insertAccount(Account account) {
+        String sql = "INSERT INTO accounts(account_id, owner_id, balance, state) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, account.getAccountId());
             stmt.setString(2, account.getOwnerId());
-            stmt.setString(3, account.getAccountType());
-            stmt.setDouble(4, account.getBalance());
-            stmt.setDouble(5, account.getInterestRate());
-            stmt.setString(6, account.getStatus());
+            stmt.setDouble(3, account.getBalance());
+            stmt.setString(4, account.getState() != null ? account.getState().toString() : "ACTIVE");
             stmt.executeUpdate();
-            core.Logger.log("Account " + account.getAccountId() + " added.");
+            System.out.println("Account " + account.getAccountId() + " inserted into database.");
         } catch (SQLException e) {
-            core.ErrorHandler.handle(e);
+            System.out.println("Error inserting account: " + e.getMessage());
         }
     }
 
     public void updateAccountBalance(Account account) {
-        try {
-            String sql = "UPDATE accounts SET balance = ?, status = ? WHERE account_id = ?";
-            PreparedStatement stmt = db.getConnection().prepareStatement(sql);
+        String sql = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDouble(1, account.getBalance());
-            stmt.setString(2, account.getStatus());
-            stmt.setString(3, account.getAccountId());
+            stmt.setString(2, account.getAccountId());
             stmt.executeUpdate();
-            core.Logger.log("Account " + account.getAccountId() + " balance updated.");
         } catch (SQLException e) {
-            core.ErrorHandler.handle(e);
+            System.out.println("Error updating account balance: " + e.getMessage());
         }
     }
 
-    // ------------------ Transactions ------------------
-    public void addTransaction(Transaction transaction) {
-        try {
-            String sql = "INSERT INTO transactions (account_id, type, amount) VALUES (?, ?, ?)";
-            PreparedStatement stmt = db.getConnection().prepareStatement(sql);
-            stmt.setString(1, transaction.getAccountId());
-            stmt.setString(2, transaction.getType());
-            stmt.setDouble(3, transaction.getAmount());
+    public void updateAccountState(Account account) {
+        String sql = "UPDATE accounts SET state = ? WHERE account_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, account.getState().toString());
+            stmt.setString(2, account.getAccountId());
             stmt.executeUpdate();
-            core.Logger.log("Transaction for account " + transaction.getAccountId() + " recorded.");
         } catch (SQLException e) {
-            core.ErrorHandler.handle(e);
+            System.out.println("Error updating account state: " + e.getMessage());
+        }
+    }
+
+    // ----------------- Transactions -----------------
+
+    public void insertTransaction(Transaction transaction) {
+        String sql = "INSERT INTO transactions(transaction_id, from_account_id, to_account_id, amount, type, status) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, transaction.getId());
+            stmt.setString(2, transaction.getFrom() != null ? transaction.getFrom().getAccountId() : null);
+            stmt.setString(3, transaction.getTo() != null ? transaction.getTo().getAccountId() : null);
+            stmt.setDouble(4, transaction.getAmount());
+            stmt.setString(5, transaction.getType().toString());
+            stmt.setString(6, transaction.getStatus().toString());
+            stmt.executeUpdate();
+            System.out.println("Transaction " + transaction.getId() + " recorded in database.");
+        } catch (SQLException e) {
+            System.out.println("Error inserting transaction: " + e.getMessage());
         }
     }
 
