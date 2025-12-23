@@ -1,5 +1,8 @@
 package account;
 
+import customer.Customer;
+import customer.TransactionEvent;
+
 /**
  *  الكلاس الأساسي لكل الحسابات البنكية.
  * يحتوي على الخصائص العامة (رقم الحساب، صاحب الحساب، الرصيد، الحالة)
@@ -9,48 +12,90 @@ package account;
 public abstract class Account {
 
     protected String accountId;
+    protected Customer owner;
     protected String ownerId;
     protected double balance;
     protected AccountState state;
 
-    public Account(String accountId, String ownerId, double initialBalance) {
+    public Account(String accountId, Customer owner, double initialBalance) {
         this.accountId = accountId;
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.balance = initialBalance;
     }
 
-    //  دالة لإيداع مبلغ
+    public Customer getOwner() {
+        return owner;
+    }
+
     public void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount;
-            System.out.println(" Deposit of " + amount + " completed. New balance: " + balance);
+        if (!(state instanceof ActiveState)) {
+            System.out.println("Cannot deposit: Account inactive");
+            return;
+        }
 
-            //  ملاحظة: هون ممكن نربط مع NotificationService من قسم العملاء لإرسال إشعار.
-            // TODO: Notify customer via NotificationService (Customer subsystem)
+        if (amount <= 0) {
+            System.out.println("Invalid deposit amount.");
+            return;
+        }
+
+        balance += amount;
+        System.out.println("Deposit of " + amount + " completed. New balance: " + balance);
+
+        // إشعار العميل
+        if (owner != null) {
+            TransactionEvent event = new TransactionEvent("Deposit", amount, accountId);
+            owner.update(event);  // هذا يستدعي NotificationService و RecommendationEngine
         }
     }
 
-    //  دالة لسحب مبلغ
     public void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            System.out.println(" Withdrawal of " + amount + " completed. New balance: " + balance);
-        } else {
-            System.out.println(" Insufficient balance or invalid amount.");
+        if (!(state instanceof ActiveState)) {
+            System.out.println("Cannot withdraw: Account inactive");
+            return;
+        }
+
+        if (amount <= 0 || balance < amount) {
+            System.out.println("Insufficient balance or invalid amount.");
+            return;
+        }
+
+        balance -= amount;
+        System.out.println("Withdrawal of " + amount + " completed. New balance: " + balance);
+
+        // إشعار العميل
+        if (owner != null) {
+            TransactionEvent event = new TransactionEvent("Withdrawal", amount, accountId);
+            owner.update(event);
         }
     }
 
-    //  دالة لتحويل الأموال بين الحسابات
     public void transfer(Account target, double amount) {
-        if (amount > 0 && amount <= balance) {
-            this.withdraw(amount);
-            target.deposit(amount);
-            System.out.println(" Transfer of " + amount + " from " + accountId + " to " + target.accountId + " successful.");
+        if (!(state instanceof ActiveState)) {
+            System.out.println("Cannot transfer: Account inactive");
+            return;
+        }
 
-            //  ملاحظة: هون ممكن نربط مع Transaction System لتسجيل العملية في سجل المعاملات.
-            // TODO: Log this transaction in Transaction subsystem
+        if (amount <= 0 || balance < amount) {
+            System.out.println("Insufficient balance or invalid amount.");
+            return;
+        }
+
+        // سحب من الحساب المرسل
+        this.withdraw(amount);
+
+        // إيداع في الحساب المستلم
+        target.deposit(amount);
+
+        System.out.println("Transfer of " + amount + " from " + accountId + " to " + target.getAccountId() + " successful.");
+
+        // إشعار صاحب الحساب المستلم
+        if (target.getOwner() != null) {
+            TransactionEvent event = new TransactionEvent("Deposit", amount, target.getAccountId());
+            target.getOwner().update(event);
         }
     }
+
+
 
     //  تغيير حالة الحساب (Active, Frozen, etc.)
     public void setState(AccountState state) {

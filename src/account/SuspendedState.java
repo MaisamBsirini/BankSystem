@@ -2,9 +2,6 @@ package account;
 
 import account.Account;
 
-/**
- *  حالة الحساب الموقوف مؤقتًا.
- */
 public class SuspendedState implements AccountState {
     @Override
     public void activate(Account account) {

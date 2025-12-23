@@ -1,35 +1,81 @@
 package core;
 
-import account.Account;
-import account.SavingsAccount;
-import java.util.Scanner;
+import account.AccountService;
+import transaction.TransactionFacade;
+import customer.CustomerService;
+import admin.monitoring.service.TransactionService;
+import admin.monitoring.dashboard.AdminDashboard;
+import admin.AdminService;
 
-/**
- * 🏦 BankSystem
- * الكلاس الأساسي لتشغيل النظام البنكي
- */
 public class BankSystem {
 
-    public static void main(String[] args) {
-        System.out.println("=========== 🏦 ADVANCED BANKING SYSTEM ===========");
+    private static BankSystem instance;
 
-        // 🔗 الاتصال بقاعدة البيانات
-        DatabaseConnection db = DatabaseConnection.getInstance();
-        db.connect();
+    private CustomerService customerService;
+    private AccountService accountService;
+    private TransactionFacade transactionFacade;
+    private AdminService adminService;
+    private TransactionService adminMonitor; // جديد
+    private Logger logger;
+    private ErrorHandler errorHandler;
 
-        // 🧾 مثال إنشاء حساب جديد
-        Account acc = new SavingsAccount("A-101", "C-001", 1000, 0.05);
-        acc.deposit(500);  // تحديث في قاعدة البيانات
+    private BankSystem() {
+        this.logger = new Logger();
+        this.errorHandler = new ErrorHandler();
+        initializeSubsystems();
+    }
 
-        // 🧰 تسجيل حدث في اللوج
-        Logger.log("Created SavingsAccount A-101 for Customer C-001");
+    public static BankSystem getInstance() {
+        if (instance == null) {
+            instance = new BankSystem();
+        }
+        return instance;
+    }
 
-        // 💬 اختبار بسيط
-        System.out.println("Final Balance: " + acc.getBalance());
+    private void initializeSubsystems() {
+        System.out.println("Initializing BankSystem...");
 
-        // 🔌 إنهاء الاتصال
-        db.disconnect();
+        // 1️⃣ تهيئة الأقسام
+        this.customerService = new CustomerService();
+        this.accountService = new AccountService();
+        this.transactionFacade = new TransactionFacade();
+        this.adminService = new AdminService();
 
-        System.out.println("=========== ✅ SYSTEM SHUTDOWN ===========");
+        // 2️⃣ تهيئة نظام مراقبة الأدمن وربطه بالـ Dashboard
+        this.adminMonitor = new TransactionService();
+        AdminDashboard dashboard = new AdminDashboard();
+        adminMonitor.attach(dashboard);
+        transactionFacade.setAdminMonitor(adminMonitor);
+
+        System.out.println("All subsystems initialized successfully.");
+    }
+
+    // Getters
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
+    }
+
+    public CustomerService getCustomerService() {
+        return customerService;
+    }
+
+    public AccountService getAccountService() {
+        return accountService;
+    }
+
+    public TransactionFacade getTransactionFacade() {
+        return transactionFacade;
+    }
+
+    public AdminService getAdminService() {
+        return adminService;
+    }
+
+    public TransactionService getAdminMonitor() {
+        return adminMonitor;
     }
 }

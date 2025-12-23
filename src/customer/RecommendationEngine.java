@@ -1,9 +1,5 @@
 package customer;
 
-
-
-
-
 public class RecommendationEngine {
 
     private RecommendationStrategy strategy;

@@ -1,5 +1,7 @@
 package account;
 
+import customer.Customer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +14,8 @@ public class CompositeAccount extends Account {
 
     private List<Account> subAccounts = new ArrayList<>();
 
-    public CompositeAccount(String accountId, String ownerId) {
-        super(accountId, ownerId, 0);
+    public CompositeAccount(String accountId, Customer owner) {
+        super(accountId, owner, 0);
     }
 
     public void addAccount(Account acc) {

@@ -1,16 +1,16 @@
 package account;
 
-/**
- *  حساب استثماري - يتعامل مع مبالغ استثمارية.
- */
+import customer.Customer;
+
 public class InvestmentAccount extends Account {
     private double investmentAmount;
     private double returnRate;
 
-    public InvestmentAccount(String accountId, String ownerId, double investmentAmount, double returnRate) {
-        super(accountId, ownerId, investmentAmount);
+    public InvestmentAccount(String accountId, Customer owner, double investmentAmount, double returnRate) {
+        super(accountId, owner, investmentAmount);
         this.investmentAmount = investmentAmount;
         this.returnRate = returnRate;
+        this.state = new ActiveState();
     }
 
     public void calculateReturns() {
@@ -21,6 +21,7 @@ public class InvestmentAccount extends Account {
 
     @Override
     public void displayAccountInfo() {
-        System.out.println(" Investment Account: " + accountId + " | Balance: " + balance + " | Return rate: " + returnRate);
+        System.out.println(" Investment Account: " + accountId + " | Owner: " + owner +
+                " | Balance: " + balance + " | Return rate: " + returnRate);
     }
 }

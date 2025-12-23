@@ -1,18 +1,16 @@
 package account;
 
-/**
- * حساب التوفير - يرث من Account
- * يتيح الفائدة الدورية على الرصيد.
- */
+import customer.Customer;
+
 public class SavingsAccount extends Account {
     private double interestRate;
 
-    public SavingsAccount(String accountId, String ownerId, double balance, double interestRate) {
-        super(accountId, ownerId, balance);
+    public SavingsAccount(String accountId, Customer owner, double balance, double interestRate) {
+        super(accountId, owner, balance);
         this.interestRate = interestRate;
+        this.state = new ActiveState();
     }
 
-    //  دالة لحساب الفائدة الشهرية
     public void applyInterest() {
         double interest = balance * interestRate;
         balance += interest;
@@ -21,6 +19,9 @@ public class SavingsAccount extends Account {
 
     @Override
     public void displayAccountInfo() {
-        System.out.println(" Savings Account: " + accountId + " | Balance: " + balance + " | Interest: " + interestRate);
+        System.out.println(" Savings Account: " + accountId +
+                " | Owner: " + owner +
+                " | Balance: " + balance +
+                " | Interest: " + interestRate);
     }
 }

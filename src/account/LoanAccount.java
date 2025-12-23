@@ -1,21 +1,20 @@
 package account;
 
-/**
- *  حساب القرض - يحتوي على مبلغ القرض المتبقي ونسبة الفائدة.
- */
+import customer.Customer;
+
 public class LoanAccount extends Account {
     private double loanAmount;
     private double remainingAmount;
     private double interestRate;
 
-    public LoanAccount(String accountId, String ownerId, double loanAmount, double interestRate) {
-        super(accountId, ownerId, 0);
+    public LoanAccount(String accountId, Customer owner, double loanAmount, double interestRate) {
+        super(accountId, owner, 0);
         this.loanAmount = loanAmount;
         this.remainingAmount = loanAmount;
         this.interestRate = interestRate;
+        this.state = new ActiveState();
     }
 
-    // 🧾 سداد جزء من القرض
     public void payInstallment(double amount) {
         if (amount > 0 && amount <= remainingAmount) {
             remainingAmount -= amount;
@@ -27,6 +26,7 @@ public class LoanAccount extends Account {
 
     @Override
     public void displayAccountInfo() {
-        System.out.println(" Loan Account: " + accountId + " | Remaining: " + remainingAmount + " | Interest: " + interestRate);
+        System.out.println(" Loan Account: " + accountId + " | Owner: " + owner +
+                " | Remaining: " + remainingAmount + " | Interest: " + interestRate);
     }
 }

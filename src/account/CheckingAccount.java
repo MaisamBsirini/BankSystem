@@ -1,15 +1,14 @@
 package account;
 
-/**
- * 💳 الحساب الجاري - يرث من Account
- * يتيح السحب المتكرر برسوم بسيطة على المعاملة.
- */
+import customer.Customer;
+
 public class CheckingAccount extends Account {
     private double transactionFee;
 
-    public CheckingAccount(String accountId, String ownerId, double balance, double fee) {
-        super(accountId, ownerId, balance);
+    public CheckingAccount(String accountId, Customer owner, double balance, double fee) {
+        super(accountId, owner, balance);
         this.transactionFee = fee;
+        this.state = new ActiveState();
     }
 
     @Override
@@ -25,6 +24,7 @@ public class CheckingAccount extends Account {
 
     @Override
     public void displayAccountInfo() {
-        System.out.println(" Checking Account: " + accountId + " | Balance: " + balance + " | Fee: " + transactionFee);
+        System.out.println(" Checking Account: " + accountId + " | Owner: " + owner +
+                " | Balance: " + balance + " | Fee: " + transactionFee);
     }
 }
