@@ -22,7 +22,7 @@ public class MainConsole {
         boolean running = true;
 
         while (running) {
-            System.out.println("\n========= 🏦 BANK SYSTEM MENU =========");
+            System.out.println("\n========= BANK SYSTEM MENU =========");
             System.out.println("1. إدارة العملاء");
             System.out.println("2. إدارة الحسابات");
             System.out.println("3. تنفيذ عملية مالية");
@@ -38,15 +38,15 @@ public class MainConsole {
                 case "3" -> manageTransactions();
                 case "4" -> showAdminReports();
                 case "5" -> {
-                    System.out.println("👋 الخروج من النظام...");
+                    System.out.println("الخروج من النظام...");
                     running = false;
                 }
-                default -> System.out.println("❌ خيار غير صحيح!");
+                default -> System.out.println("خيار غير صحيح!");
             }
         }
     }
 
-    // ====== 👤 قسم العملاء ======
+    // ====== قسم العملاء ======
     private void manageCustomers() {
         System.out.println("\n=== إدارة العملاء ===");
         System.out.println("1. إضافة عميل جديد");
@@ -65,7 +65,7 @@ public class MainConsole {
 
                 Customer customer = new Customer(name, engine);
                 bankSystem.getCustomerService().addCustomer(customer);
-                System.out.println("✅ تمت إضافة العميل بنجاح.");
+                System.out.println("تمت إضافة العميل بنجاح.");
             }
             case "2" -> bankSystem.getCustomerService().listCustomers();
             case "3" -> {
@@ -75,11 +75,11 @@ public class MainConsole {
                 String msg = scanner.nextLine();
                 bankSystem.getCustomerService().sendInquiry(name, msg);
             }
-            default -> System.out.println("❌ خيار غير صحيح!");
+            default -> System.out.println("خيار غير صحيح!");
         }
     }
 
-    // ====== 💰 قسم الحسابات ======
+    // ====== قسم الحسابات ======
     private void manageAccounts() {
         System.out.println("\n=== إدارة الحسابات ===");
         System.out.println("1. إنشاء حساب جديد");
@@ -94,7 +94,7 @@ public class MainConsole {
             case "2" -> updateAccount();
             case "3" -> closeAccount();
             case "4" -> bankSystem.getAccountService().listAccounts();
-            default -> System.out.println("❌ خيار غير صحيح!");
+            default -> System.out.println("خيار غير صحيح!");
         }
     }
 
@@ -104,7 +104,7 @@ public class MainConsole {
         Customer owner = bankSystem.getCustomerService().findByName(ownerName);
 
         if (owner == null) {
-            System.out.println("❌ العميل غير موجود، أضفه أولاً!");
+            System.out.println("العميل غير موجود، أضفه أولاً!");
             return;
         }
 
@@ -146,12 +146,12 @@ public class MainConsole {
                 double rate = Double.parseDouble(scanner.nextLine());
                 account = new InvestmentAccount(id, owner, invest, rate);
             }
-            default -> System.out.println("❌ نوع غير صحيح!");
+            default -> System.out.println("نوع غير صحيح!");
         }
 
         if (account != null) {
             bankSystem.getAccountService().createAccount(account);
-            System.out.println("✅ تم إنشاء الحساب بنجاح.");
+            System.out.println("تم إنشاء الحساب بنجاح.");
         }
     }
 
@@ -160,7 +160,7 @@ public class MainConsole {
         String id = scanner.nextLine();
         Account acc = bankSystem.getAccountService().findById(id);
         if (acc == null) {
-            System.out.println("❌ الحساب غير موجود.");
+            System.out.println("الحساب غير موجود.");
             return;
         }
         System.out.print("الرصيد الجديد: ");
@@ -174,7 +174,7 @@ public class MainConsole {
         bankSystem.getAccountService().closeAccount(id);
     }
 
-    // ====== 💸 قسم المعاملات ======
+    // ====== قسم المعاملات ======
     private void manageTransactions() {
         System.out.println("\n=== تنفيذ عملية مالية ===");
         System.out.println("1. إيداع");
@@ -189,7 +189,7 @@ public class MainConsole {
             case "2" -> withdraw();
             case "3" -> transfer();
             case "4" -> scheduleRecurringTransaction();
-            default -> System.out.println("❌ خيار غير صحيح!");
+            default -> System.out.println("خيار غير صحيح!");
         }
     }
 
@@ -198,7 +198,7 @@ public class MainConsole {
         String id = scanner.nextLine();
         Account acc = bankSystem.getAccountService().findById(id);
         if (acc == null) {
-            System.out.println("❌ الحساب غير موجود.");
+            System.out.println("الحساب غير موجود.");
             return;
         }
         System.out.print("المبلغ: ");
@@ -211,7 +211,7 @@ public class MainConsole {
         String id = scanner.nextLine();
         Account acc = bankSystem.getAccountService().findById(id);
         if (acc == null) {
-            System.out.println("❌ الحساب غير موجود.");
+            System.out.println("الحساب غير موجود.");
             return;
         }
         System.out.print("المبلغ: ");
@@ -231,7 +231,7 @@ public class MainConsole {
         Account to = bankSystem.getAccountService().findById(toId);
 
         if (from == null || to == null) {
-            System.out.println("❌ أحد الحسابين غير موجود.");
+            System.out.println("أحد الحسابين غير موجود.");
             return;
         }
 
@@ -252,7 +252,7 @@ public class MainConsole {
         Account from = bankSystem.getAccountService().findById(fromId);
         Account to = bankSystem.getAccountService().findById(toId);
         if (from == null || to == null) {
-            System.out.println("❌ أحد الحسابين غير موجود.");
+            System.out.println("أحد الحسابين غير موجود.");
             return;
         }
 
@@ -260,10 +260,9 @@ public class MainConsole {
         bankSystem.getTransactionFacade().scheduleRecurringTransaction(tx, 3, repeat);
     }
 
-
-    // ====== 🧾 تقارير الأدمن ======
+    // ====== تقارير الأدمن ======
     private void showAdminReports() {
-        System.out.println("\n=== 🧑‍💼 قائمة الأدمن ===");
+        System.out.println("\n=== قائمة الأدمن ===");
         System.out.println("1. عرض تقرير إداري");
         System.out.println("2. عرض كل تذاكر العملاء");
         System.out.println("3. الرد على تذكرة");
@@ -284,12 +283,11 @@ public class MainConsole {
                         .replyToTicket(bankSystem.getCustomerService().getTicketService(), id, reply);
             }
             case "4" -> bankSystem.getAdminService().stopAllScheduledTransactions();
-            default -> System.out.println("❌ خيار غير صحيح!");
+            default -> System.out.println("خيار غير صحيح!");
         }
     }
 
-
-    // ====== 🔚 Main ======
+    // ====== Main ======
     public static void main(String[] args) {
         new MainConsole().start();
     }
