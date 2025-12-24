@@ -2,6 +2,7 @@ package console;
 
 import core.BankSystem;
 import account.*;
+import core.DummyDataLoader;
 import customer.*;
 import transaction.*;
 import admin.AdminService;
@@ -16,6 +17,7 @@ public class MainConsole {
     public MainConsole() {
         this.bankSystem = BankSystem.getInstance();
         this.scanner = new Scanner(System.in);
+      //  DummyDataLoader.loadDemoData(bankSystem);
     }
 
     public void start() {
